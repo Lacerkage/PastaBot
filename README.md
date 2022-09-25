@@ -11,3 +11,11 @@ A Fediverse bot that automatically uploads all image posts on [ptchan](https://p
 ## Useful links 
 
 - [jschan documentation](http://fatchan.gitgud.site/jschan-docs/#introduction) 
+
+## Roadmap
+
+- Periodically update with new threads
+- Handle large size files
+- Handle editing
+- Handle removing
+- Handle formatting

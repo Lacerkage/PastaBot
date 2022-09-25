@@ -14,12 +14,4 @@ if __name__ == "__main__":
 
     # DEVELOPMENT PURPOSES: Delete very post
     bot.purge()
-
-    ptchan = JSChan("https://ptchan.org")
-
-    # for thread in ptchan.get_overboard()["threads"][:1]:
-    #     bot.post_thread(thread)
-
-    thread = ptchan.get_thread("cyb", "8396")
-
-    bot.post_thread(thread)
+    bot.update()
