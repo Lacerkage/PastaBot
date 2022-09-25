@@ -1,8 +1,11 @@
 import datetime
+import os
 import requests
 
 from .pleroma import Pleroma
 from .jschan import JSChan
+
+
 
 ptchan = JSChan("https://ptchan.org")
 
@@ -13,8 +16,9 @@ class Bot(Pleroma):
 
         self.last_update = None
 
-        with open("last_update.txt", "r") as f:
-            self.last_update = datetime.datetime.strptime(f.read(), "%Y-%m-%dT%H:%M:%S.%fZ")
+        if os.path.isfile("last_update.txt"):
+            with open("last_update.txt", "r") as f:
+                self.last_update = datetime.datetime.strptime(f.read(), "%Y-%m-%dT%H:%M:%S.%fZ")
 
     def _post_thread(self, thread):
         post_id = thread['postId']
