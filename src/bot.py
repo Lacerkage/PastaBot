@@ -55,8 +55,8 @@ class Bot(Pleroma):
                 except Exception as e: 
                     print(e)
 
-            self.last_update = datetime.datetime.now()
+        self.last_update = datetime.datetime.now()
 
-            with open("last_update.txt", "w") as f:
-                f.write(self.last_update.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
+        with open("last_update.txt", "w") as f:
+            f.write(self.last_update.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
                 
