@@ -13,6 +13,9 @@ class Bot(Pleroma):
 
         self.last_update = None
 
+        with open("last_update.txt", "r") as f:
+            self.last_update = datetime.datetime.strptime(f.read(), "%Y-%m-%dT%H:%M:%S.%fZ")
+
     def _post_thread(self, thread):
         post_id = thread['postId']
         board = thread["board"]
@@ -24,6 +27,7 @@ class Bot(Pleroma):
 
         media = []
 
+        # Retrieve thread files
         for file in thread["files"]:
             response = requests.get(f"https://ptchan.org/file/{file['filename']}")
             data = response.content
@@ -39,4 +43,16 @@ class Bot(Pleroma):
             thread_date = datetime.datetime.strptime(thread["date"], "%Y-%m-%dT%H:%M:%S.%fZ")
 
             if self.last_update == None or thread_date > self.last_update:
-                self._post_thread(thread)
+                try:
+                    self._post_thread(thread)
+
+                    print(f"Thread {thread['id']} uploaded")
+
+                except Exception as e: 
+                    print(e)
+
+            self.last_update = datetime.datetime.now()
+
+            with open("last_update.txt", "w") as f:
+                f.write(self.last_update.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
+                
