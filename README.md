@@ -1,6 +1,6 @@
 # Pasta Bot 🍝
 
-> A inteligência artificial mais esparguete que existe 🍝
+> A inteligência artificial mais esparguete que existe
 
 <p align="center">
     <img src="marta.png">
