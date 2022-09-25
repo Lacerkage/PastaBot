@@ -1,6 +1,8 @@
 # Pasta Bot 🍝
 
-![](marta.png)
+<p align="center">
+    <img src="marta.png">
+</p>
 
 A Fediverse bot that automatically uploads all image posts on [ptchan](https://ptchan.org/) along with their text content.
 
