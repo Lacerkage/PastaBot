@@ -1,5 +1,6 @@
 import os
 import requests
+import sys
 
 from dotenv import load_dotenv
 from src import Bot
@@ -11,16 +12,29 @@ from time import sleep
 load_dotenv()
 
 if __name__ == "__main__":
-    bot = Bot("https://pasta.wtf", os.getenv("ACCESS_TOKEN"))
+    bot = Bot(os.getenv("FEDIVERSE_INSTANCE"), os.getenv("ACCESS_TOKEN"))
+    ptchan = JSChan(os.getenv("JSCHAN_WEBSITE"))
 
-    # DEVELOPMENT PURPOSES: Delete very post
-    bot.purge()
+    if sys.argv[1] == "--purge":
+        bot.purge()
 
-    while True:
-        print("Updating...")
+    elif sys.argv[1] == "--update":
+        while True:
+            print("Updating...")
+
+            bot.update()
+
+            print("Update finished.")
+
+            sleep(os.getenv("UPDATE_TIME"))
+
+    elif sys.argv[1] == "--post":
+        thread_board = sys.argv[2]
+        thread_id = sys.argv[3]
         
-        bot.update()
+        thread = ptchan.get_thread(thread_board, thread_id)
 
-        print("Update finished.")
+        bot._post_thread(thread)
 
-        sleep(60)
+    else:
+        print("Usage: python main.py [--purge] [--update]")

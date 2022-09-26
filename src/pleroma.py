@@ -18,7 +18,7 @@ class Pleroma():
         print(f"Deleted status {id}")
 
     def purge(self):
-        account_id = "ANsxILwMPM70O4URma"
+        account_id = "ANsxILwMPM70O4URma"  # TODO: Dynamically set it
         res = requests.get(f"{self.api_url}/accounts/{account_id}/statuses")
 
         if not res.ok:
@@ -58,7 +58,8 @@ class Pleroma():
                 "sensitive": sensitive,
                 "status": body,
                 "content_type": "text/markdown",
-                "media_ids": media_ids
+                "media_ids": media_ids,
+                "visibility": "private"
             },
             headers={
                 "Authorization": f"Bearer {self.access_token}"
@@ -68,4 +69,4 @@ class Pleroma():
         if not res.ok:
             res.raise_for_status()
 
-        print(res)
+        return True
