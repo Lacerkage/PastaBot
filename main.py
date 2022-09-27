@@ -1,5 +1,4 @@
 import os
-import requests
 import sys
 
 from dotenv import load_dotenv
@@ -12,7 +11,12 @@ from time import sleep
 load_dotenv()
 
 if __name__ == "__main__":
-    bot = Bot(os.getenv("FEDIVERSE_INSTANCE"), os.getenv("ACCESS_TOKEN"))
+    if "BOARDS_WHITELIST" in os.environ:  # checks if whitelist exists
+        bot = Bot(os.getenv("FEDIVERSE_INSTANCE"), os.getenv("ACCESS_TOKEN"),
+                  allowed_boards=os.getenv("BOARDS_WHITELIST").split())
+    else:
+        bot = Bot(os.getenv("FEDIVERSE_INSTANCE"), os.getenv("ACCESS_TOKEN"))
+
     ptchan = JSChan(os.getenv("JSCHAN_WEBSITE"))
 
     if sys.argv[1] == "--purge":
@@ -31,7 +35,7 @@ if __name__ == "__main__":
     elif sys.argv[1] == "--post":
         thread_board = sys.argv[2]
         thread_id = sys.argv[3]
-        
+
         thread = ptchan.get_thread(thread_board, thread_id)
 
         bot._post_thread(thread)

@@ -13,10 +13,11 @@ ptchan = JSChan(os.getenv("JSCHAN_WEBSITE"))
 
 
 class Bot(Pleroma):
-    def __init__(self, instance_url, access_token):
+    def __init__(self, instance_url, access_token, allowed_boards=None):
         Pleroma.__init__(self, instance_url, access_token)
 
         self.last_update = None
+        self.allowed_boards = allowed_boards
 
         if os.path.isfile("last_update.txt"):
             with open("last_update.txt", "r") as f:
@@ -44,16 +45,15 @@ class Bot(Pleroma):
             print(f"Post /{board}/{post_id} made with success")
 
     def update(self):
-        threads = ptchan.get_overboard()
+        threads = ptchan.get_overboard_catalog(boards=self.allowed_boards)
 
         for thread in threads:
             thread_date = datetime.datetime.strptime(thread["date"], "%Y-%m-%dT%H:%M:%S.%fZ")
 
-            if self.last_update == None or thread_date > self.last_update:
+            if self.last_update or thread_date > self.last_update:
                 try:
                     self._post_thread(thread)
-
-                    print(f"Thread {thread['id']} uploaded")
+                    print(f"Thread {thread['board']}/{thread['postId']} uploaded")
 
                 except Exception as e:
                     print(e)
