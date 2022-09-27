@@ -1,12 +1,12 @@
 # Pasta Bot 🍝
 
-> A inteligência artificial mais esparguete que existe
+> The most spaghetti AI that exists
 
 <p align="center">
     <img src="marta.png">
 </p>
 
-A Fediverse bot that automatically uploads all image posts on [ptchan](https://ptchan.org/) along with their text content.
+A Pleroma bot that automatically uploads all image posts on a [jschan](https://gitgud.io/fatchan/jschan) website along with their text content.
 
 ## Useful links 
 
