@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-ptchan = JSChan(os.getenv("JSCHAN_WEBSITE"))
+imageboard = JSChan(os.getenv("JSCHAN_WEBSITE"))
 
 
 class Bot(Pleroma):
@@ -23,20 +23,20 @@ class Bot(Pleroma):
             with open("last_update.txt", "r") as f:
                 self.last_update = datetime.datetime.strptime(f.read(), "%Y-%m-%dT%H:%M:%S.%fZ")
 
-    def _post_thread(self, thread):
+    def post_thread(self, thread):
         post_id = thread['postId']
         board = thread["board"]
         subject = thread["subject"] or "Fio"
         message = thread["message"].replace("\n", "  \n")  # Add two spaces for Markdown parsing
         sensitive = thread["spoiler"]
 
-        body = f"**{subject}:** [/{board}/{post_id}](https://ptchan.org/{board}/thread/{post_id}.html)  \n\n{message}"
+        body = f"**{subject}:** [/{board}/{post_id}]({imageboard.base_url}/{board}/thread/{post_id}.html)  \n\n{message}"
 
         media = []
 
         # Retrieve thread files
         for file in thread["files"]:
-            response = requests.get(f"https://ptchan.org/file/{file['filename']}")
+            response = requests.get(f"{imageboard.base_url}/file/{file['filename']}")
             data = response.content
 
             media.append(data)
@@ -45,14 +45,14 @@ class Bot(Pleroma):
             print(f"Post /{board}/{post_id} made with success")
 
     def update(self):
-        threads = ptchan.get_overboard_catalog(boards=self.allowed_boards)
+        threads = imageboard.get_overboard_catalog(boards=self.allowed_boards)
 
         for thread in threads:
             thread_date = datetime.datetime.strptime(thread["date"], "%Y-%m-%dT%H:%M:%S.%fZ")
 
             if self.last_update or thread_date > self.last_update:
                 try:
-                    self._post_thread(thread)
+                    self.post_thread(thread)
                     print(f"Thread {thread['board']}/{thread['postId']} uploaded")
 
                 except Exception as e:

@@ -1,9 +1,7 @@
 import requests
 
-from rich import print
 
-
-class JSChan():
+class JSChan:
     def __init__(self, base_url):
         self.base_url = base_url
 
@@ -25,8 +23,8 @@ class JSChan():
 
         return res.json()["threads"]
 
-    def get_thread(self, board, id):
-        res = requests.get(f"{self.base_url}/{board}/thread/{id}.json")
+    def get_thread(self, board, thread_id):
+        res = requests.get(f"{self.base_url}/{board}/thread/{thread_id}.json")
 
         if not res.ok:
             res.raise_for_status()

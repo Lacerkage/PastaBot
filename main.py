@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
             print("Update finished.")
 
-            sleep(os.getenv("UPDATE_TIME"))
+            sleep(float(os.getenv("UPDATE_TIME")))
 
     elif sys.argv[1] == "--post":
         thread_board = sys.argv[2]
@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
         thread = ptchan.get_thread(thread_board, thread_id)
 
-        bot._post_thread(thread)
+        bot.post_thread(thread)
 
     else:
         print("Usage: python main.py [--purge] [--update]")
