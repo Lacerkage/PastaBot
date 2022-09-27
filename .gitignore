@@ -1,5 +1,6 @@
 __pycache__/
 
-.env
+.env*
+!.env.example
 
 last_update.txt

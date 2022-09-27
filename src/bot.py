@@ -7,17 +7,14 @@ from .jschan import JSChan
 
 from dotenv import load_dotenv
 
-load_dotenv()
-
-imageboard = JSChan(os.getenv("JSCHAN_WEBSITE"))
-
 
 class Bot(Pleroma):
-    def __init__(self, instance_url, access_token, allowed_boards=None):
-        Pleroma.__init__(self, instance_url, access_token)
+    def __init__(self, instance_url, access_token, account_id, jschan_website, allowed_boards=None):
+        Pleroma.__init__(self, instance_url, access_token, account_id)
 
         self.last_update = None
         self.allowed_boards = allowed_boards
+        self.imageboard = JSChan(jschan_website)
 
         if os.path.isfile("last_update.txt"):
             with open("last_update.txt", "r") as f:
@@ -30,13 +27,13 @@ class Bot(Pleroma):
         message = thread["message"].replace("\n", "  \n")  # Add two spaces for Markdown parsing
         sensitive = thread["spoiler"]
 
-        body = f"**{subject}:** [/{board}/{post_id}]({imageboard.base_url}/{board}/thread/{post_id}.html)  \n\n{message}"
+        body = f"**{subject}:** [/{board}/{post_id}]({self.imageboard.base_url}/{board}/thread/{post_id}.html)  \n\n{message}"
 
         media = []
 
         # Retrieve thread files
         for file in thread["files"]:
-            response = requests.get(f"{imageboard.base_url}/file/{file['filename']}")
+            response = requests.get(f"{self.imageboard.base_url}/file/{file['filename']}")
             data = response.content
 
             media.append(data)
@@ -45,7 +42,7 @@ class Bot(Pleroma):
             print(f"Post /{board}/{post_id} made with success")
 
     def update(self):
-        threads = imageboard.get_overboard_catalog(boards=self.allowed_boards)
+        threads = self.imageboard.get_overboard_catalog(boards=self.allowed_boards)
 
         for thread in threads:
             thread_date = datetime.datetime.strptime(thread["date"], "%Y-%m-%dT%H:%M:%S.%fZ")

@@ -1,16 +1,13 @@
 import os
 import requests
 
-from dotenv import load_dotenv
-
-load_dotenv()
 
 class Pleroma():
-    def __init__(self, instance_url, access_token):
+    def __init__(self, instance_url, access_token, account_id):
         self.instance_url = instance_url
         self.api_url = f"{instance_url}/api/v1"
         self.access_token = access_token
-        self.account_id = os.getenv("ACCOUNT_ID")
+        self.account_id = account_id
 
     def delete_status(self, id):
         res = requests.delete(f"{self.api_url}/statuses/{id}", headers={
@@ -22,13 +19,13 @@ class Pleroma():
 
         print(f"Deleted status {id}")
 
-    def purge(self):
+    def purge(self, num_posts=-1):
         res = requests.get(f"{self.api_url}/accounts/{self.account_id}/statuses")
 
         if not res.ok:
             res.raise_for_status()
 
-        for status in res.json():
+        for status in res.json()[:num_posts]:
             self.delete_status(status["id"])
 
     def upload_media(self, media):
@@ -63,7 +60,7 @@ class Pleroma():
                 "status": body,
                 "content_type": "text/markdown",
                 "media_ids": media_ids,
-                "visibility": "private"
+                "visibility": "list:5",
             },
             headers={
                 "Authorization": f"Bearer {self.access_token}"
