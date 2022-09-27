@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
             print("Update finished.")
 
-            sleep(float(os.getenv("UPDATE_TIME")))
+            sleep(os.getenv("UPDATE_INTERVAL"))
 
     elif sys.argv[1] == "--post":
         thread_board = sys.argv[2]
@@ -41,4 +41,4 @@ if __name__ == "__main__":
         bot.post_thread(thread)
 
     else:
-        print("Usage: python main.py [--purge] [--update]")
+        print("Usage: python main.py [--purge] [--update] [--post <board> <id>]")

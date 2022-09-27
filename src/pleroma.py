@@ -1,11 +1,16 @@
+import os
 import requests
 
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class Pleroma():
     def __init__(self, instance_url, access_token):
         self.instance_url = instance_url
         self.api_url = f"{instance_url}/api/v1"
         self.access_token = access_token
+        self.account_id = os.getenv("ACCOUNT_ID")
 
     def delete_status(self, id):
         res = requests.delete(f"{self.api_url}/statuses/{id}", headers={
@@ -18,8 +23,7 @@ class Pleroma():
         print(f"Deleted status {id}")
 
     def purge(self):
-        account_id = "ANsxILwMPM70O4URma"  # TODO: Dynamically set it
-        res = requests.get(f"{self.api_url}/accounts/{account_id}/statuses")
+        res = requests.get(f"{self.api_url}/accounts/{self.account_id}/statuses")
 
         if not res.ok:
             res.raise_for_status()
