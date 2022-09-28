@@ -1,23 +1,22 @@
-import os
 import requests
 
 
-class Pleroma():
+class Pleroma:
     def __init__(self, instance_url, access_token, account_id):
         self.instance_url = instance_url
         self.api_url = f"{instance_url}/api/v1"
         self.access_token = access_token
         self.account_id = account_id
 
-    def delete_status(self, id):
-        res = requests.delete(f"{self.api_url}/statuses/{id}", headers={
+    def delete_status(self, status_id):
+        res = requests.delete(f"{self.api_url}/statuses/{status_id}", headers={
             "Authorization": f"Bearer {self.access_token}"
         })
 
         if not res.ok:
             res.raise_for_status()
 
-        print(f"Deleted status {id}")
+        print(f"Deleted status {status_id}")
 
     def purge(self, num_posts=-1):
         res = requests.get(f"{self.api_url}/accounts/{self.account_id}/statuses")
@@ -44,7 +43,9 @@ class Pleroma():
 
         return res.json()
 
-    def post_status(self, body, sensitive=False, media=[]):
+    def post_status(self, body, sensitive=False, media=None):
+        if media is None:
+            media = []
         media_ids = []
 
         if len(media) != 0:

@@ -5,8 +5,6 @@ import requests
 from .pleroma import Pleroma
 from .jschan import JSChan
 
-from dotenv import load_dotenv
-
 
 class Bot(Pleroma):
     def __init__(self, instance_url, access_token, account_id, jschan_website, allowed_boards=None):
