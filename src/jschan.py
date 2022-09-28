@@ -23,8 +23,24 @@ class JSChan:
 
         return res.json()["threads"]
 
-    def get_thread(self, board, thread_id):
-        res = requests.get(f"{self.base_url}/{board}/thread/{thread_id}.json")
+    def get_thread(self, board_uri, thread_id):
+        res = requests.get(f"{self.base_url}/{board_uri}/thread/{thread_id}.json")
+
+        if not res.ok:
+            res.raise_for_status()
+
+        return res.json()
+
+    def get_board_settings(self, board_uri):
+        res = requests.get(f"{self.base_url}/{board_uri}/settings.json")
+
+        if not res.ok:
+            res.raise_for_status()
+
+        return res.json()
+
+    def get_board_list(self):
+        res = requests.get(f"{self.base_url}/boards.json")
 
         if not res.ok:
             res.raise_for_status()
