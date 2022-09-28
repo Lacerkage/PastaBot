@@ -7,6 +7,8 @@ from .jschan import JSChan
 
 from dotenv import load_dotenv
 
+from rich import print
+
 
 class Bot(Pleroma):
     def __init__(self, instance_url, access_token, account_id, jschan_website, allowed_boards=None):
@@ -22,12 +24,20 @@ class Bot(Pleroma):
 
     def post_thread(self, thread):
         post_id = thread['postId']
-        board = thread["board"]
+        board_uri = thread["board"]
         subject = thread["subject"] or "Fio"
         message = thread["message"].replace("\n", "  \n")  # Add two spaces for Markdown parsing
         sensitive = thread["spoiler"]
 
-        body = f"**{subject}:** [/{board}/{post_id}]({self.imageboard.base_url}/{board}/thread/{post_id}.html)  \n\n{message}"
+        # Check if board is NSFW
+        boards = self.imageboard.get_board_list()["boards"]
+        board = list(filter(lambda x: x["_id"] == board_uri, boards))[0]
+
+        if not board["settings"]["sfw"]:
+            sensitive = True
+
+        body = f"**{subject}:** [/{board_uri}/{post_id}]({self.imageboard.base_url}/{board_uri}/thread/{post_id}.html)  \n\n"
+        body += message
 
         media = []
 
