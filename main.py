@@ -13,17 +13,13 @@ load_dotenv(".env.development")
 jschan_website = JSChan(os.getenv("JSCHAN_WEBSITE"))
 
 if __name__ == "__main__":
-    if "BOARDS_WHITELIST" in os.environ:  # Checks if whitelist exists
-        bot = Bot(
-            os.getenv("FEDIVERSE_INSTANCE"),
-            os.getenv("ACCESS_TOKEN"),
-            os.getenv("ACCOUNT_ID"),
-            os.getenv("JSCHAN_WEBSITE"),
-            allowed_boards=os.getenv("BOARDS_WHITELIST").split()
-        )
-
-    else:
-        bot = Bot(os.getenv("FEDIVERSE_INSTANCE"), os.getenv("ACCESS_TOKEN"))
+    bot = Bot(
+        os.getenv("FEDIVERSE_INSTANCE"),
+        os.getenv("ACCESS_TOKEN"),
+        os.getenv("ACCOUNT_ID"),
+        os.getenv("JSCHAN_WEBSITE"),
+        allowed_boards=os.getenv("BOARDS_WHITELIST").split() if "BOARDS_WHITELIST" in os.environ else None
+    )
 
     imageboard = JSChan(os.getenv("JSCHAN_WEBSITE"))
 
