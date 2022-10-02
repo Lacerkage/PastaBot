@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
         bot.purge(num_posts)
 
-    elif sys.argv[1] == "--update":
+    elif sys.argv[1] == "--start":
         while True:
             print("Updating...")
 
@@ -47,4 +47,4 @@ if __name__ == "__main__":
         bot.post_thread(thread)
 
     else:
-        print("Usage: python main.py [--purge <num_posts>] [--update] [--post <board> <id>]")
+        print("Usage: python main.py [--purge <num_posts>] [--start] [--post <board> <id>]")
