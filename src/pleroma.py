@@ -18,8 +18,11 @@ class Pleroma:
 
         print(f"Deleted status {status_id}")
 
-    def get_statuses(self):
-        res = requests.get(f"{self.api_url}/accounts/{self.account_id}/statuses")
+    def get_statuses(self, account_id=None):
+        if account_id == None:
+            account_id = self.account_id
+
+        res = requests.get(f"{self.api_url}/accounts/{account_id}/statuses")
 
         if not res.ok:
             res.raise_for_status()
