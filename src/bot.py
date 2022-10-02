@@ -65,3 +65,12 @@ class Bot(Pleroma):
 
         with open("last_update.txt", "w") as f:
             f.write(self.last_update.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
+
+    def purge(self, num_posts=-1):
+        statuses = self.get_statuses()
+
+        for status in statuses[:num_posts]:
+            self.delete_status(status["id"])
+
+        if len(statuses) == 0:
+            print("No posts were deleted.")

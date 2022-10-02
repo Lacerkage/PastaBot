@@ -18,14 +18,13 @@ class Pleroma:
 
         print(f"Deleted status {status_id}")
 
-    def purge(self, num_posts=-1):
+    def get_statuses(self):
         res = requests.get(f"{self.api_url}/accounts/{self.account_id}/statuses")
 
         if not res.ok:
             res.raise_for_status()
 
-        for status in res.json()[:num_posts]:
-            self.delete_status(status["id"])
+        return res.json()
 
     def upload_media(self, media):
         res = requests.post(
