@@ -46,3 +46,13 @@ class JSChan:
             res.raise_for_status()
 
         return res.json()
+
+    def get_board_log_day(self, board, day, month, year):
+        day, month = map(lambda x: str(x).zfill(2), (day, month))
+
+        res = requests.get(f"{self.base_url}/{board}/logs/{month}-{day}-{year}.json")
+
+        if not res.ok:
+            res.raise_for_status()
+
+        return res.json()
