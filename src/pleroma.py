@@ -22,7 +22,9 @@ class Pleroma:
         if account_id == None:
             account_id = self.account_id
 
-        res = requests.get(f"{self.api_url}/accounts/{account_id}/statuses")
+        res = requests.get(f"{self.api_url}/accounts/{account_id}/statuses", headers={
+            "Authorization": f"Bearer {self.access_token}"
+        })
 
         if not res.ok:
             res.raise_for_status()
