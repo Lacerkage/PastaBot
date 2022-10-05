@@ -19,12 +19,12 @@ class Pleroma:
         print(f"Deleted status {status_id}")
 
     def get_statuses(self, account_id=None):
-        if account_id == None:
+        if account_id is None:
             account_id = self.account_id
 
-        res = requests.get(f"{self.api_url}/accounts/{account_id}/statuses", headers={
-            "Authorization": f"Bearer {self.access_token}"
-        })
+        res = requests.get(
+            f"{self.api_url}/accounts/{account_id}/statuses",
+            headers={"Authorization": f"Bearer {self.access_token}"})
 
         if not res.ok:
             res.raise_for_status()
@@ -34,12 +34,8 @@ class Pleroma:
     def upload_media(self, media):
         res = requests.post(
             f"{self.api_url}/media",
-            files={
-                "file": media
-            },
-            headers={
-                "Authorization": f"Bearer {self.access_token}"
-            }
+            files={"file": media},
+            headers={"Authorization": f"Bearer {self.access_token}"}
         )
 
         if not res.ok:
@@ -50,29 +46,19 @@ class Pleroma:
     def post_status(self, body, sensitive=False, media=None):
         if media is None:
             media = []
-        media_ids = []
-
-        if len(media) != 0:
-            for file in media:
-                attachment = self.upload_media(file)
-
-                media_ids.append(attachment["id"])
 
         res = requests.post(
             f"{self.api_url}/statuses",
-            json={
-                "sensitive": sensitive,
-                "status": body,
-                "content_type": "text/markdown",
-                "media_ids": media_ids,
-                "visibility": "list:5",
-            },
-            headers={
-                "Authorization": f"Bearer {self.access_token}"
-            }
+            json={"sensitive": sensitive,
+                  "status": body,
+                  "content_type": "text/markdown",
+                  "media_ids": [self.upload_media(file)["id"] for file in media],
+                  "visibility": "list:5",
+                  },
+            headers={"Authorization": f"Bearer {self.access_token}"}
         )
 
         if not res.ok:
             res.raise_for_status()
 
-        return True
+        return res.json()["id"]

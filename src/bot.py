@@ -2,18 +2,17 @@ import datetime
 import os
 import requests
 
-from .pleroma import Pleroma
-from .jschan import JSChan
 
+class Bot:
+    def __init__(self, pleroma, jschan, allowed_boards=None, on_publish=None):
+        self.jschan = jschan
+        self.pleroma = pleroma
 
-class Bot(Pleroma):
-    def __init__(self, instance_url, access_token, account_id, jschan_website, allowed_boards=None):
-        Pleroma.__init__(self, instance_url, access_token, account_id)
-
-        self.last_update = None
         self.allowed_boards = allowed_boards
-        self.imageboard = JSChan(jschan_website)
+        self.on_publish = on_publish
 
+        # Tries to load last update
+        self.last_update = None
         if os.path.isfile("last_update.txt"):
             with open("last_update.txt", "r") as f:
                 self.last_update = datetime.datetime.strptime(f.read(), "%Y-%m-%dT%H:%M:%S.%fZ")
@@ -25,36 +24,41 @@ class Bot(Pleroma):
         message = thread["message"].replace("\n", "  \n")  # Add two spaces for Markdown parsing
         sensitive = thread["spoiler"]
 
+        # TODO board list only returns listed boards, an expection is thrown if a unlisted board
+        #  is provided in the whitelist... which is a problem. See how can we deal with this in a sensible manner
+
         # Check if board is NSFW
-        boards = self.imageboard.get_board_list()["boards"]
-        board = list(filter(lambda x: x["_id"] == board_uri, boards))[0]
+        # boards = self.imageboard.get_board_list()["boards"]
+        # board = list(filter(lambda x: x["_id"] == board_uri, boards))[0]
+        # if not board["settings"]["sfw"]:
+        # sensitive = True
 
-        if not board["settings"]["sfw"]:
-            sensitive = True
-
-        body = f"**{subject}:** [/{board_uri}/{post_id}]({self.imageboard.base_url}/{board_uri}/thread/{post_id}.html)  \n\n"
+        body = f"**{subject}:** [/{board_uri}/{post_id}]({self.jschan.base_url}/{board_uri}/thread/{post_id}.html)  \n\n"
         body += message
 
         media = []
-
         # Retrieve thread files
         for file in thread["files"]:
-            response = requests.get(f"{self.imageboard.base_url}/file/{file['filename']}")
-            data = response.content
+            res = requests.get(f"{self.jschan.base_url}/file/{file['filename']}")
+            # Skips file if something happened
+            if not res.ok:
+                continue
+            media.append(res.content)
 
-            media.append(data)
+        status_id = self.pleroma.post_status(body, sensitive=sensitive, media=media)
+        print(f"Post /{board_uri}/{post_id} made with success, id:{status_id}")
 
-        if self.post_status(body, sensitive=sensitive, media=media):
-            print(f"Post /{board}/{post_id} made with success")
+        self.on_publish(post_id, board_uri, status_id)
 
     def update(self):
-        threads = self.imageboard.get_overboard_catalog(boards=self.allowed_boards)
+        threads = self.jschan.get_overboard_catalog(boards=self.allowed_boards)
 
         for thread in threads:
             thread_date = datetime.datetime.strptime(thread["date"], "%Y-%m-%dT%H:%M:%S.%fZ")
 
-            if self.last_update or thread_date > self.last_update:
+            if self.last_update and thread_date > self.last_update:
                 try:
+                    print(thread)
                     self.post_thread(thread)
                     print(f"Thread {thread['board']}/{thread['postId']} uploaded")
 
@@ -67,10 +71,10 @@ class Bot(Pleroma):
             f.write(self.last_update.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
 
     def purge(self, num_posts=-1):
-        statuses = self.get_statuses()
+        statuses = self.pleroma.get_statuses()
 
         for status in statuses[:num_posts]:
-            self.delete_status(status["id"])
+            self.pleroma.delete_status(status["id"])
 
         if len(statuses) == 0:
             print("No posts were deleted.")
